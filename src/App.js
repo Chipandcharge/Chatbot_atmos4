@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import v4 from "uuid";
 
+
 import "./styles.css";
+import Axios from "axios";
 
 export default function App() {
   const [messages, setMessages] = useState([]);
@@ -11,6 +13,7 @@ export default function App() {
     text: "",
     date: ""
   });
+
 
   function handleChange(e) {
     setMessage({
@@ -26,6 +29,22 @@ export default function App() {
     console.log(all_messages);
     all_messages.push(message);
     setMessages(all_messages);
+
+    // Axios call to db PUT to DB:chats
+
+    var message_json = JSON.stringify(message)
+    var path = "localhost:5003/chats/" + message.id
+
+    Axios.post('localhost:5003/_session', {"name": "amdin", "password": "password"}, {headers: {'Accept':'application/json','Content-Type': 'application/json'}})
+      .then(Axios.put(path, message_json, {headers: {'Content-Type': 'application/json'}})
+        .then(function(response) {
+          console.log(response);
+        })
+        .catch(function(error) {
+          console.log(error)
+        })
+      );
+    
     setMessage({ text: "" });
     e.preventDefault();
   }
