@@ -27,5 +27,8 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "repository": "https://github.com/Chipandcharge/Chatbot_atmos4.git",
+  "author": "chipandcharge <akubsch94@gmail.com>",
+  "license": "MIT"
 }

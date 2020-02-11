@@ -1,23 +1,64 @@
-import React, { useState } from "react";
+import React, { useState} from "react";
 import v4 from "uuid";
+import axios from "axios";
 
 
 import "./styles.css";
-import axios from "axios";
 
 export default function App() {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState({
-    id: "",
+    _id: "",
     position: "",
     text: "",
     date: ""
   });
 
+  const [dbSession, setDbSession] = useState(false)
+
+
+  function loginToDatabase() {
+
+    var data = {"name": "amdin", "password": "password"}
+    var config_session = {"headers": {"Accept": "application/json", "Content-Type": "application/json"}};
+    var message_json = JSON.stringify(message)
+
+    if (!dbSession) {
+      axios
+        .post('http://elchradio.selfhost.eu:5003/_session',data, config_session)
+        .then((response) => {
+          console.log("user authenticated")
+          setDbSession(true)
+        })
+        .then((res) => putToDatabase(message_json))
+        .catch((err) => {
+          console.log(err)
+        })
+    } else {
+      putToDatabase(message_json)
+    }
+  }
+
+  function putToDatabase(doc) {
+
+    var config_put = {"headers": {"Accept": "application/json", "Content-Type": "application/json"}};
+    var path_put = 'http://@elchradio.selfhost.eu:5003/chats/' + message._id
+    console.log(path_put)
+
+    axios
+      .put(path_put, doc, config_put)
+      .then((response) => {
+        console.log(response)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+
+  }
 
   function handleChange(e) {
     setMessage({
-      id: v4(),
+      _id: v4(),
       position: "right",
       text: e.target.value,
       date: Date(Date.now())
@@ -30,21 +71,8 @@ export default function App() {
     all_messages.push(message);
     setMessages(all_messages);
 
-    // Axios call to db PUT to DB:chats
+    loginToDatabase()
 
-    var message_json = JSON.stringify(message)
-    var path = "localhost:5003/chats/" + message.id
-
-    axios.post('localhost:5003/_session', {"name": "amdin", "password": "password"}, {headers: {'Accept':'application/json','Content-Type': 'application/json'}})
-      .then(axios.put(path, message_json, {headers: {'Content-Type': 'application/json'}})
-        .then(function(response) {
-          console.log(response);
-        })
-        .catch(function(error) {
-          console.log(error)
-        })
-      );
-    
     setMessage({ text: "" });
     e.preventDefault();
   }
@@ -61,10 +89,10 @@ export default function App() {
                   if (message_single.position === "right") {
                     return (
                       <>
-                        <div className="time">
+                        <div className="time" >
                           {message_single.date.toString()}
                         </div>
-                        <div className="message user">
+                        <div className="message user" >
                           {message_single.text}
                         </div>
                       </>
