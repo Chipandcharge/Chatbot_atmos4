@@ -1,7 +1,13 @@
-FROM node:alpine
-WORKDIR /app
-COPY package.json /app/package.json
-COPY yarn.lock /app/yarn.lock
-ENV PATH /app/node_modules/.bin:$PATH
+#Stage 1 Build process
+FROM node:alpine as build-deps
+WORKDIR /usr/src/app
+COPY package.json yarn.lock ./
 RUN yarn
-CMD ["yarn", "start"]
+COPY . ./
+RUN yarn build
+
+# Stage 2 Production
+FROM nginx:1.12-alpine
+COPY --from=build-deps /usr/src/app/build /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g" , "daemon off;"]

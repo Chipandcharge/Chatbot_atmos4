@@ -3,7 +3,7 @@ import v4 from "uuid";
 
 
 import "./styles.css";
-import Axios from "axios";
+import axios from "axios";
 
 export default function App() {
   const [messages, setMessages] = useState([]);
@@ -35,8 +35,8 @@ export default function App() {
     var message_json = JSON.stringify(message)
     var path = "localhost:5003/chats/" + message.id
 
-    Axios.post('localhost:5003/_session', {"name": "amdin", "password": "password"}, {headers: {'Accept':'application/json','Content-Type': 'application/json'}})
-      .then(Axios.put(path, message_json, {headers: {'Content-Type': 'application/json'}})
+    axios.post('localhost:5003/_session', {"name": "amdin", "password": "password"}, {headers: {'Accept':'application/json','Content-Type': 'application/json'}})
+      .then(axios.put(path, message_json, {headers: {'Content-Type': 'application/json'}})
         .then(function(response) {
           console.log(response);
         })
