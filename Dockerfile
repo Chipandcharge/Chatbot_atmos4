@@ -7,7 +7,7 @@ COPY . ./
 RUN yarn build
 
 # Stage 2 Production
-FROM nginx:1.12-alpine
-COPY --from=build-deps /usr/src/app/build /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g" , "daemon off;"]
+FROM yobasystems/alpine-nginx:arm32v7
+COPY --from=build-deps /usr/src/app/build /etc/nginx/html
+EXPOSE 8
+CMD ["nginx"]
